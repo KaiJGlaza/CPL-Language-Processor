@@ -97,22 +97,97 @@ class IdentifierTable:
 # ---------------------------------------------------------------------------
 # Comment remover module (Person 1)
 # ---------------------------------------------------------------------------
+def _is_word_char(ch):
+    """True if ch can be part of an identifier (letter, digit, underscore)."""
+    return ch.isalnum() or ch == "_"
+ 
+ 
 def remove_comments(text):
-    """Strip '//' to end-of-line and '/* ... */' block comments.
-
-    Requirements:
-      - Walk character by character so '//' or '/*' inside a "string" is
-        NOT treated as a comment.
-      - Keep every newline (even inside block comments) so line numbers
-        stay correct.
-      - Replace comment text with nothing (or a space for block comments).
-      - Unterminated '/*' -> report_error at the line where it started.
+    """Strip comments from the whole source text.
+ 
+    Comment forms (from scl_subset.txt):
+        //            to the end of the line
+        description   up to and including */
+ 
+    Rules:
+      - Walk the text character by character so that '//' or 'description'
+        inside a "string" is NOT treated as a comment. A string cannot span
+        lines, so a newline ends string mode (an unterminated string is
+        reported later by read_string).
+      - 'description' only starts a comment when it is a whole word, so
+        identifiers like 'descriptions' or 'my_description' are untouched.
+        It is lowercase only, like every other keyword.
+      - Comments do not nest: once inside one, only '*/' (or, for '//', the
+        end of the line) matters.
+      - Every newline is kept, even inside a removed comment, so line
+        numbers stay correct for later error messages.
+      - Each removed comment is replaced by one space so the tokens on
+        either side of it cannot run together.
+      - An unterminated 'description' comment is reported at the line where
+        it started, and the rest of the file is treated as comment.
+ 
     Returns the cleaned text.
     """
-    # TODO
-    pass
-
-
+    result = []
+    n = len(text)
+    i = 0
+    line = 1
+    in_string = False
+ 
+    while i < n:
+        ch = text[i]
+ 
+        # Inside a string: copy everything; a quote or newline ends it.
+        if in_string:
+            result.append(ch)
+            if ch == '"':
+                in_string = False
+            elif ch == "\n":
+                in_string = False
+                line += 1
+            i += 1
+            continue
+ 
+        # Start of a string.
+        if ch == '"':
+            in_string = True
+            result.append(ch)
+            i += 1
+            continue
+ 
+        # '//' comment: skip to the end of the line (keep the newline).
+        if text.startswith("//", i):
+            while i < n and text[i] != "\n":
+                i += 1
+            result.append(" ")
+            continue
+ 
+        # 'description' comment: only when it is a whole word.
+        if text.startswith("description", i):
+            after = i + len("description")
+            before_ok = i == 0 or not _is_word_char(text[i - 1])
+            after_ok = after >= n or not _is_word_char(text[after])
+            if before_ok and after_ok:
+                close = text.find("*/", after)
+                if close == -1:
+                    report_error(line, "unterminated comment "
+                                       "(started with 'description')")
+                    close = n
+                else:
+                    close += 2
+                skipped_newlines = text.count("\n", i, close)
+                result.append(" " + "\n" * skipped_newlines)
+                line += skipped_newlines
+                i = close
+                continue
+ 
+        # Ordinary character.
+        if ch == "\n":
+            line += 1
+        result.append(ch)
+        i += 1
+ 
+    return "".join(result)
 # ---------------------------------------------------------------------------
 # Line splitting module
 # ---------------------------------------------------------------------------
