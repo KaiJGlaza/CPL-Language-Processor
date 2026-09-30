@@ -108,25 +108,6 @@ def remove_comments(text):
     Comment forms (from scl_subset.txt):
         //            to the end of the line
         description   up to and including */
- 
-    Rules:
-      - Walk the text character by character so that '//' or 'description'
-        inside a "string" is NOT treated as a comment. A string cannot span
-        lines, so a newline ends string mode (an unterminated string is
-        reported later by read_string).
-      - 'description' only starts a comment when it is a whole word, so
-        identifiers like 'descriptions' or 'my_description' are untouched.
-        It is lowercase only, like every other keyword.
-      - Comments do not nest: once inside one, only '*/' (or, for '//', the
-        end of the line) matters.
-      - Every newline is kept, even inside a removed comment, so line
-        numbers stay correct for later error messages.
-      - Each removed comment is replaced by one space so the tokens on
-        either side of it cannot run together.
-      - An unterminated 'description' comment is reported at the line where
-        it started, and the rest of the file is treated as comment.
- 
-    Returns the cleaned text.
     """
     result = []
     n = len(text)
@@ -217,24 +198,64 @@ def read_word(line_text, start, line_number, id_table):
     """Read letter {letter | digit | '_'}.
     If the word is in KEYWORDS -> KEYWORD token (keywords are lowercase only).
     Otherwise -> IDENTIFIER token, and add it to id_table."""
-    # TODO
-    pass
+    end = start + 1
+    while end < len(line_text) and _is_word_char(line_text[end]):
+        end += 1
+    word = line_text[start:end]
+ 
+    if word in KEYWORDS:
+        return make_token(KEYWORD, KEYWORDS[word], word, line_number), end
+ 
+    id_table.add(word, line_number)
+    return make_token(IDENTIFIER, IDENTIFIER_ID, word, line_number), end
 
 
 def read_number(line_text, start, line_number):
     """Read digit {digit}, optionally followed by '.' digit {digit}.
     INTEGER_CONST (300) or REAL_CONST (301).
     A '.' with no digit after it (e.g. '3.') is an error."""
-    # TODO
-    pass
+     n = len(line_text)
+    end = start
+    while end < n and _is_digit(line_text[end]):
+        end += 1
+ 
+    is_real = False
+    if end < n and line_text[end] == ".":
+        if end + 1 < n and _is_digit(line_text[end + 1]):
+            end += 1
+            while end < n and _is_digit(line_text[end]):
+                end += 1
+            is_real = True
+        else:
+            report_error(line_number,
+                         f"malformed real constant '{line_text[start:end + 1]}'"
+                         " (digits required after '.')")
+            return None, end + 1
+ 
+    if end < n and _is_word_char(line_text[end]):
+        while end < n and _is_word_char(line_text[end]):
+            end += 1
+        report_error(line_number,
+                     f"invalid token '{line_text[start:end]}'"
+                     " (identifiers must start with a letter)")
+        return None, end
+ 
+    text = line_text[start:end]
+    if is_real:
+        return make_token(REAL_CONST, REAL_CONST_ID, text, line_number), end
+    return make_token(INTEGER_CONST, INTEGER_CONST_ID, text, line_number), end
 
 
 def read_string(line_text, start, line_number):
     """Read from the opening '"' to the closing '"'.
     Token value = the text between the quotes.
     If the line ends first -> report 'unterminated string'."""
-    # TODO
-    pass
+     close = line_text.find('"', start + 1)
+    if close == -1:
+        report_error(line_number, "unterminated string")
+        return None, len(line_text)
+    value = line_text[start + 1:close]
+    return make_token(STRING, STRING_ID, value, line_number), close + 1
 
 
 def read_operator(line_text, start, line_number):
