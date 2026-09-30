@@ -33,9 +33,16 @@ errors = []  # list of (line_number, message)
 
 def report_error(line, message):
     """Record a scanning error and print it.
-    Policy: report, skip the bad piece, keep scanning."""
-    # TODO: append (line, message) to errors and print "Line N: ERROR - message"
-    pass
+    Policy: report, skip the bad piece, keep scanning.
+	
+	Arguments:
+		line: line number in the SCL file where the error was found
+		message: short description, ex: "unterminated string"
+	
+	"""
+    errors.append((line, message))
+	print(f"Line {line}: ERROR - {message}")
+    
 
 
 # ---------------------------------------------------------------------------
