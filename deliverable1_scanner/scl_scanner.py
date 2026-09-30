@@ -77,14 +77,21 @@ class IdentifierTable:
         self.table = {}  # name -> first line number
 
     def add(self, name, line):
-        """Add name if it is not already in the table."""
-        # TODO
-        pass
+        """Add name if it is not already in the table.
+			Returns True if it was new, False if it was already there.
+		"""
+        if name in self.table:
+            return False
+        self.table[name] = line
+        return True
+        
+	def exists(self, name):
+        """Return True if name is already in the table."""
+        return name in self.table	
 
     def to_dict(self):
         """Return the table as a dictionary for JSON output."""
-        # TODO
-        pass
+        return dict(self.table)
 
 
 # ---------------------------------------------------------------------------
