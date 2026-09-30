@@ -240,8 +240,17 @@ def read_string(line_text, start, line_number):
 def read_operator(line_text, start, line_number):
     """Match operators from OPERATORS.
     Look ahead one character so '==' (108) wins over '=' (101)."""
-    # TODO
-    pass
+   two_chars = line_text[start:start + 2]
+    if two_chars in OPERATORS:
+        return (make_token(OPERATOR, OPERATORS[two_chars], two_chars,
+                           line_number), start + 2)
+ 
+    one_char = line_text[start:start + 1]
+    if one_char in OPERATORS:
+        return (make_token(OPERATOR, OPERATORS[one_char], one_char,
+                           line_number), start + 1)
+ 
+    return None, start
 
 
 # ---------------------------------------------------------------------------
