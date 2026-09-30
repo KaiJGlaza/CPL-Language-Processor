@@ -192,10 +192,23 @@ def remove_comments(text):
 # Line splitting module
 # ---------------------------------------------------------------------------
 def split_lines(text):
-    """Return a list of (line_number, line_text) pairs, numbered from 1."""
-    # TODO
-    pass
-
+    """Return a list of (line_number, line_text) pairs, numbered from 1.
+ 
+    Rules:
+      - Split only on '\\n', the same character remove_comments counts, so
+        the line numbers of the two steps always agree. (str.splitlines()
+        also splits on other characters and could throw numbering off.)
+      - A trailing '\\r' (Windows line endings) is removed from each line.
+      - Blank lines are kept so numbering stays correct; scan_line simply
+        produces no tokens for them.
+      - A final newline at the end of the file does not create an extra
+        empty line.
+    """
+    pieces = text.split("\n")
+    if pieces and pieces[-1] == "":
+        pieces.pop()
+    return [(number, piece.rstrip("\r"))
+            for number, piece in enumerate(pieces, start=1)]
 
 # ---------------------------------------------------------------------------
 # Token readers (each returns (token, next_index))
