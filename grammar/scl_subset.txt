@@ -1,0 +1,76 @@
+CS 4308 - SCL Subset Grammar (EBNF)
+====================================
+
+Notation
+--------
+  ::=          "is defined as"
+  |            or
+  { ... }      repeat zero or more times
+  [ ... ]      optional (zero or one time)
+  "word"       a keyword or symbol, written exactly as shown
+  <name>       a grammar rule (non-terminal)
+  CAPS         a token produced by the scanner (see Lexical Rules)
+
+
+Syntax Rules
+------------
+<program>       ::= <import> "implementations" <function>
+
+<import>        ::= "import" STRING
+
+<function>      ::= "function" "main" "return" "type" <type> "is"
+                    "variables" <declarations>
+                    "begin" <statements>
+                    "endfun" "main"
+
+<declarations>  ::= <declaration> { <declaration> }
+<declaration>   ::= "define" IDENTIFIER "of" "type" <type>
+<type>          ::= "integer" | "real"
+
+<statements>    ::= <statement> { <statement> }
+<statement>     ::= <set_stmt>
+                  | <display_stmt>
+                  | <input_stmt>
+                  | <if_stmt>
+                  | <exit_stmt>
+
+<set_stmt>      ::= "set" IDENTIFIER "=" <expression>
+<display_stmt>  ::= "display" <display_item> { "," <display_item> }
+<display_item>  ::= STRING | <expression>
+<input_stmt>    ::= "input" STRING "," IDENTIFIER
+<if_stmt>       ::= "if" <condition> "then" <statements>
+                    [ "else" <statements> ]
+                    "endif"
+<exit_stmt>     ::= "exit"
+
+<condition>     ::= <expression> <rel_op> <expression>
+<rel_op>        ::= ">" | "<" | "=="
+
+<expression>    ::= <term> { ( "+" | "-" ) <term> }
+<term>          ::= <factor> { ( "*" | "/" ) <factor> }
+<factor>        ::= IDENTIFIER | INTEGER_CONST | REAL_CONST
+
+
+Lexical Rules (what the scanner recognizes)
+-------------------------------------------
+IDENTIFIER      ::= letter { letter | digit | "_" }     (must not be a keyword)
+INTEGER_CONST   ::= digit { digit }
+REAL_CONST      ::= digit { digit } "." digit { digit }
+STRING          ::= '"' { any character except '"' } '"'
+letter          ::= "a".."z" | "A".."Z"
+digit           ::= "0".."9"
+
+Comments (skipped by the scanner):
+  "//" to the end of the line
+  "description" up to and including "*/"
+
+
+Keywords (22)
+-------------
+Structure:     import, implementations, function, main, return, type,
+               is, variables, begin, endfun
+Declarations:  define, of, integer, real
+Actions:       set, display, input, exit
+Conditionals:  if, then, else, endif
+
+Operators:     =  +  -  *  /  >  <  ==  ,
