@@ -42,9 +42,22 @@ def report_error(line, message):
 # Token helper (scl_token.py)
 # ---------------------------------------------------------------------------
 def make_token(token_type, token_id, value, line):
-    """Build and return a Token object."""
-    # TODO: return Token(token_type, token_id, value, line)
-    pass
+    """Build and return a Token object.
+	
+	Token creation happens here.
+	
+	Arguments:
+	 token_type: one of KEYWORD, OPERATOR, IDENTIFIER, INTEGER_CONST,
+                    REAL_CONST, STRING, UNKNOWN (constants from scl_token.py)
+        token_id:   the ID number for this token (from KEYWORDS, OPERATORS,
+                    or one of the *_ID constants)
+        value:      the actual text of the token (for STRING, the text
+                    between the quotes)
+        line:       the line number in the SCL file where it was found
+	
+	"""
+    return Token(token_type, token_id, value, line)
+    
 
 
 # ---------------------------------------------------------------------------
