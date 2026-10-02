@@ -332,22 +332,37 @@ def scan_source(text, id_table):
 # Output
 # ---------------------------------------------------------------------------
 def print_tokens(tokens):
-    """Print each token to the console using str(token)."""
-    # TODO
-    pass
+    for token in tokens:
+        print(token)
+    print(f"Total tokens: {len(tokens)}")
 
+
+def print_identifier_table(id_table):
+    print("Identifiers (first line seen):")
+    if not id_table.table:
+        print("  (none)")
+        return
+    for name, line in id_table.to_dict().items():
+        print(f"  {name}: line {line}")
 
 def save_json(tokens, id_table, path):
-    """Write the tokens (and identifier table) to a JSON file.
-    Tokens: [t.to_dict() for t in tokens]"""
-    # TODO
-    pass
+   try:
+        with open(path, "w") as out_file:
+            json.dump([token.to_dict() for token in tokens], out_file, indent=2)
+        return True
+    except OSError as problem:
+        print(f"Could not write '{path}': {problem}")
+        return False
 
 
 def print_error_summary():
     """Print the total error count and each error, or 'No errors'."""
-    # TODO
-    pass
+    if not errors:
+        print("No errors.")
+        return
+    print(f"{len(errors)} error(s) found:")
+    for line, message in sorted(errors, key=lambda e: e[0]):
+        print(f"  Line {line}: {message}")
 
 
 # ---------------------------------------------------------------------------
