@@ -369,10 +369,16 @@ def print_error_summary():
 # Driver
 # ---------------------------------------------------------------------------
 def read_source(path):
-    """Return the file contents as a string.
-    If the file is missing/unreadable, print a clean message and exit(2)."""
-    # TODO
-    pass
+    try:
+        with open(path, "r", encoding="utf-8") as source_file:
+            return source_file.read()
+    except FileNotFoundError:
+        print(f"Error: no such file: '{path}'")
+    except UnicodeDecodeError:
+        print(f"Error: '{path}' is not a readable text file (UTF-8 expected)")
+    except OSError as problem:
+        print(f"Error: could not read '{path}': {problem}")
+    sys.exit(2)
 
 
 def main():
@@ -387,8 +393,25 @@ def main():
     7. print_error_summary()
     8. Exit with a non-zero code if any errors were reported.
     """
-    # TODO
-    pass
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Usage: python scl_scanner.py <source_file.scl> [output.json]")
+        sys.exit(2)
+ 
+    source_path = sys.argv[1]
+    json_path = sys.argv[2] if len(sys.argv) == 3 else "OutputTokens.json"
+ 
+    text = read_source(source_path)
+    id_table = IdentifierTable()
+    tokens = scan_source(text, id_table)
+ 
+    print_tokens(tokens)
+    print_identifier_table(id_table)
+    json_saved = save_json(tokens, json_path)
+    if json_saved:
+        print(f"Token list saved to {json_path}")
+    print_error_summary()
+ 
+    sys.exit(1 if (errors or not json_saved) else 0)
 
 
 if __name__ == "__main__":
