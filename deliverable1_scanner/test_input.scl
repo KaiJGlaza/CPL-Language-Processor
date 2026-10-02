@@ -1,0 +1,44 @@
+import "stdio"
+
+implementations
+
+function main return type integer is
+variables
+    define count of type integer
+    define total of type integer
+    define price of type real
+    define average_2 of type real
+begin
+    description
+        Test program for the SCL scanner.
+        This comment spans several lines
+        and ends at the closing marker. */
+
+    // Assignments and arithmetic (all four operators)
+    set count = 10
+    set total = count * 2 + 5 - 3 / 1
+    set price = 45.95            // a real constant
+    set average_2 = price / 2
+
+    // Input and display, including strings with comment-like text
+    input "Enter a number", count
+    display "Total is: ", total
+    display "Not a comment: // or description */ here", price
+
+    // Conditions: each relational operator
+    if count > 5 then
+        display "count is big"
+    else
+        display "count is small"
+    endif
+
+    if total < 100 then
+        display "total is under 100"
+    endif
+
+    if count == total then
+        display "count equals total"
+    endif
+
+    exit
+endfun main
