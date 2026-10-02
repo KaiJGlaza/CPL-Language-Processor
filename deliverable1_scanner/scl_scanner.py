@@ -280,7 +280,6 @@ def read_operator(line_text, start, line_number):
 def scan_line(line_text, line_number, id_table):
     """Scan one line and return a list of Tokens.
 
-    Dispatch on the current character:
       whitespace        -> skip
       letter            -> read_word
       digit             -> read_number
@@ -289,15 +288,44 @@ def scan_line(line_text, line_number, id_table):
       anything else     -> report_error, make an UNKNOWN token, skip the
                            character, keep scanning
     """
-    # TODO
-    pass
+     tokens = []
+    i = 0
+    n = len(line_text)
+ 
+    while i < n:
+        ch = line_text[i]
+ 
+        if ch.isspace():
+            i += 1
+            continue
+ 
+        if _is_letter(ch):
+            token, next_i = read_word(line_text, i, line_number, id_table)
+        elif _is_digit(ch):
+            token, next_i = read_number(line_text, i, line_number)
+        elif ch == '"':
+            token, next_i = read_string(line_text, i, line_number)
+        elif ch in OPERATOR_START_CHARS:
+            token, next_i = read_operator(line_text, i, line_number)
+        else:
+            report_error(line_number, f"unknown character '{ch}'")
+            token = make_token(UNKNOWN, UNKNOWN_ID, ch, line_number)
+            next_i = i + 1
+ 
+        if token is not None:
+            tokens.append(token)
+ 
+        i = next_i if next_i > i else i + 1
+ 
+    return tokens
 
 
 def scan_source(text, id_table):
-    """Remove comments, split into lines, scan every line.
-    Returns the full list of Tokens."""
-    # TODO
-    pass
+     cleaned = remove_comments(text)
+    tokens = []
+    for line_number, line_text in split_lines(cleaned):
+        tokens.extend(scan_line(line_text, line_number, id_table))
+    return tokens
 
 
 # ---------------------------------------------------------------------------
