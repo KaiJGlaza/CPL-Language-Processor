@@ -43,14 +43,13 @@ screenshots/              Screenshots of program runs
 
 **Scanner**
 ```
-python deliverable1_scanner/scl_scanner.py examples/welcome.scl
+python deliverable1_scanner/scl_scanner.py examples/examplefile.scl
 ```
-Prints the tokens to the console and writes them to a JSON file in
-`deliverable1_scanner`.
+Prints the tokens to the console and writes them to a JSON file
 
 **Parser**
 ```
-python deliverable2_parser/scl_parser.py examples/welcome.scl
+python deliverable2_parser/scl_parser.py examples/examplefile.scl
 ```
 
 **Interpreter**
