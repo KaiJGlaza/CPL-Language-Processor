@@ -46,7 +46,7 @@ screenshots/              Screenshots of program runs
 python deliverable1_scanner/scl_scanner.py examples/welcome.scl
 ```
 Prints the tokens to the console and writes them to a JSON file in
-`deliverable1_scanner/output/`.
+`deliverable1_scanner`.
 
 **Parser**
 ```

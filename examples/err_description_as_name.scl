@@ -1,0 +1,17 @@
+description
+  Test: the word description used as a variable name.
+  In SCL that word always starts a comment, so it cannot be an identifier.
+  Here it opens a comment that is never closed, which swallows the rest of
+  the program. The scanner should report it rather than fail silently.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define description of type integer
+begin
+    set description = 5
+    exit
+endfun main
+
+// EXPECT: Line 11: unterminated comment (started with 'description')

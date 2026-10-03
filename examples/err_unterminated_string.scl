@@ -1,0 +1,24 @@
+description
+  Test: unterminated strings.
+  A string with no closing quote should be reported on its own line, and
+  scanning should pick up normally on the next line, with line numbers
+  still correct after the error.
+*/
+import "scl.h
+implementations
+function main return type integer is
+variables
+    define x of type integer
+begin
+    display "Hello, world
+    set x = 5
+    display "x is: ", x, " and this one never ends
+    display "this line // is fine"
+    input "Enter a value, x
+    exit
+endfun main
+
+// EXPECT: Line 7: unterminated string
+// EXPECT: Line 13: unterminated string
+// EXPECT: Line 15: unterminated string
+// EXPECT: Line 17: unterminated string

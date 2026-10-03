@@ -1,0 +1,22 @@
+description
+  Test: characters from outside plain ASCII.
+  Curly "smart" quotes and en dashes get inserted when code is copied out
+  of Word, Google Docs, or a chat app. They are not the characters our
+  grammar uses, so the scanner should flag them. Accented letters are not
+  letters in our grammar (only a-z and A-Z).
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define café of type real
+begin
+    display “Hello”
+    set x = 5 – 2
+    exit
+endfun main
+
+// EXPECT: Line 12: unknown character 'é'
+// EXPECT: Line 14: unknown character '“'
+// EXPECT: Line 14: unknown character '”'
+// EXPECT: Line 15: unknown character '–'

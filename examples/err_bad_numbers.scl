@@ -1,0 +1,29 @@
+description
+  Test: malformed numeric constants.
+  Covers a real with no digits after the dot, numbers that run into
+  letters or underscores (identifiers must start with a letter), and a
+  constant with two decimal points.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define 2count of type integer
+    define rate of type real
+begin
+    set rate = 3.
+    set rate = 12abc
+    set rate = 1_000
+    set rate = 3.14.15
+    set rate = 7.x
+    set rate = 0.25
+    exit
+endfun main
+
+// EXPECT: Line 11: invalid token '2count' (identifiers must start with a letter)
+// EXPECT: Line 14: malformed real constant '3.' (digits required after '.')
+// EXPECT: Line 15: invalid token '12abc' (identifiers must start with a letter)
+// EXPECT: Line 16: invalid token '1_000' (identifiers must start with a letter)
+// Line 17 scans as 3.14 then a stray '.' then 15, so the stray dot is reported.
+// EXPECT: Line 17: unknown character '.'
+// EXPECT: Line 18: malformed real constant '7.' (digits required after '.')

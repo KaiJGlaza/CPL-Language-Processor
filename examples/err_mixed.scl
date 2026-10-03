@@ -1,0 +1,27 @@
+description
+  Test: several kinds of errors close together.
+  Checks that multiple errors on one line are all reported, that a
+  multi-line comment in the middle of the program does not throw off
+  line numbers, and that the scanner keeps going to the end of the file.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define a of type integer   // a comment with $ and "a quote inside
+    define b of type real
+begin
+    set a = 4 $ 5. @ "oops
+    description
+       a comment in the middle
+       spanning three lines */
+    set b = 9z + ?
+    exit
+endfun main
+
+// EXPECT: Line 14: unknown character '$'
+// EXPECT: Line 14: malformed real constant '5.' (digits required after '.')
+// EXPECT: Line 14: unknown character '@'
+// EXPECT: Line 14: unterminated string
+// EXPECT: Line 18: invalid token '9z' (identifiers must start with a letter)
+// EXPECT: Line 18: unknown character '?'
