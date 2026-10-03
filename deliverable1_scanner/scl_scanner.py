@@ -34,14 +34,14 @@ errors = []  # list of (line_number, message)
 def report_error(line, message):
     """Record a scanning error and print it.
     Policy: report, skip the bad piece, keep scanning.
-	
-	Arguments:
-		line: line number in the SCL file where the error was found
-		message: short description, ex: "unterminated string"
-	
-	"""
+    
+    Arguments:
+        line: line number in the SCL file where the error was found
+        message: short description, ex: "unterminated string"
+    
+    """
     errors.append((line, message))
-	print(f"Line {line}: ERROR - {message}")
+    print(f"Line {line}: ERROR - {message}")
     
 
 
@@ -50,19 +50,19 @@ def report_error(line, message):
 # ---------------------------------------------------------------------------
 def make_token(token_type, token_id, value, line):
     """Build and return a Token object.
-	
-	Token creation happens here.
-	
-	Arguments:
-	 token_type: one of KEYWORD, OPERATOR, IDENTIFIER, INTEGER_CONST,
+    
+    Token creation happens here.
+    
+    Arguments:
+     token_type: one of KEYWORD, OPERATOR, IDENTIFIER, INTEGER_CONST,
                     REAL_CONST, STRING, UNKNOWN (constants from scl_token.py)
         token_id:   the ID number for this token (from KEYWORDS, OPERATORS,
                     or one of the *_ID constants)
         value:      the actual text of the token (for STRING, the text
                     between the quotes)
         line:       the line number in the SCL file where it was found
-	
-	"""
+    
+    """
     return Token(token_type, token_id, value, line)
     
 
@@ -78,16 +78,16 @@ class IdentifierTable:
 
     def add(self, name, line):
         """Add name if it is not already in the table.
-			Returns True if it was new, False if it was already there.
-		"""
+            Returns True if it was new, False if it was already there.
+        """
         if name in self.table:
             return False
         self.table[name] = line
         return True
         
-	def exists(self, name):
+    def exists(self, name):
         """Return True if name is already in the table."""
-        return name in self.table	
+        return name in self.table   
 
     def to_dict(self):
         """Return the table as a dictionary for JSON output."""
@@ -97,9 +97,19 @@ class IdentifierTable:
 # ---------------------------------------------------------------------------
 # Comment remover module (Person 1)
 # ---------------------------------------------------------------------------
+def _is_letter(ch):
+    """True for a-z or A-Z (the grammar's definition of a letter)."""
+    return ("a" <= ch <= "z") or ("A" <= ch <= "Z")
+
+
+def _is_digit(ch):
+    """True for 0-9."""
+    return "0" <= ch <= "9"
+
+
 def _is_word_char(ch):
     """True if ch can be part of an identifier (letter, digit, underscore)."""
-    return ch.isalnum() or ch == "_"
+    return _is_letter(ch) or _is_digit(ch) or ch == "_"
  
  
 def remove_comments(text):
@@ -214,7 +224,7 @@ def read_number(line_text, start, line_number):
     """Read digit {digit}, optionally followed by '.' digit {digit}.
     INTEGER_CONST (300) or REAL_CONST (301).
     A '.' with no digit after it (e.g. '3.') is an error."""
-     n = len(line_text)
+    n = len(line_text)
     end = start
     while end < n and _is_digit(line_text[end]):
         end += 1
@@ -250,7 +260,7 @@ def read_string(line_text, start, line_number):
     """Read from the opening '"' to the closing '"'.
     Token value = the text between the quotes.
     If the line ends first -> report 'unterminated string'."""
-     close = line_text.find('"', start + 1)
+    close = line_text.find('"', start + 1)
     if close == -1:
         report_error(line_number, "unterminated string")
         return None, len(line_text)
@@ -261,7 +271,7 @@ def read_string(line_text, start, line_number):
 def read_operator(line_text, start, line_number):
     """Match operators from OPERATORS.
     Look ahead one character so '==' (108) wins over '=' (101)."""
-   two_chars = line_text[start:start + 2]
+    two_chars = line_text[start:start + 2]
     if two_chars in OPERATORS:
         return (make_token(OPERATOR, OPERATORS[two_chars], two_chars,
                            line_number), start + 2)
@@ -277,6 +287,10 @@ def read_operator(line_text, start, line_number):
 # ---------------------------------------------------------------------------
 # Core scanning loop
 # ---------------------------------------------------------------------------
+# Characters that can begin an operator ('=' starts both '=' and '==')
+OPERATOR_START_CHARS = {op[0] for op in OPERATORS}
+
+
 def scan_line(line_text, line_number, id_table):
     """Scan one line and return a list of Tokens.
 
@@ -288,7 +302,7 @@ def scan_line(line_text, line_number, id_table):
       anything else     -> report_error, make an UNKNOWN token, skip the
                            character, keep scanning
     """
-     tokens = []
+    tokens = []
     i = 0
     n = len(line_text)
  
@@ -321,7 +335,7 @@ def scan_line(line_text, line_number, id_table):
 
 
 def scan_source(text, id_table):
-     cleaned = remove_comments(text)
+    cleaned = remove_comments(text)
     tokens = []
     for line_number, line_text in split_lines(cleaned):
         tokens.extend(scan_line(line_text, line_number, id_table))
@@ -345,8 +359,8 @@ def print_identifier_table(id_table):
     for name, line in id_table.to_dict().items():
         print(f"  {name}: line {line}")
 
-def save_json(tokens, id_table, path):
-   try:
+def save_json(tokens, path):
+    try:
         with open(path, "w") as out_file:
             json.dump([token.to_dict() for token in tokens], out_file, indent=2)
         return True
