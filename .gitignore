@@ -1,6 +1,7 @@
-   __pycache__/
-   *.pyc
-   .vscode/
-   .idea/
-   *.zip
-   .DS_Store
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+*.zip
+.DS_Store
+OutputTokens.json
