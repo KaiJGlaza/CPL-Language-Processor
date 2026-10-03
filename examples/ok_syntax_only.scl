@@ -1,0 +1,21 @@
+description
+  Test: lexically valid but syntactically wrong.
+  Every token here is legal, so the scanner should report no errors.
+  The mistakes are grammar mistakes (wrong order, an unsupported type,
+  an uppercase keyword, a <= operator our subset does not have), which
+  the parser in Deliverable 2 must catch. Reuse this file then.
+*/
+import "scl.h"
+implementations
+function main return type double is
+variables
+    define x of type double
+begin
+    SET x = 5
+    set = x 5
+    if x <= 3 then
+    display x x x
+    endfun
+endif main
+
+// EXPECT: none

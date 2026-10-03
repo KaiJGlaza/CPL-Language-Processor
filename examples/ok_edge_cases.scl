@@ -1,0 +1,29 @@
+description
+  Test: tricky input that is still valid. None of it should be an error.
+  No spaces around operators, a tab for indentation, comment markers and
+  the word description inside strings, an empty string, == next to =,
+  identifiers that begin with a keyword, a comment in the middle of a
+  line, and blank lines.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+	define count_1 of type integer
+    define integer_total of type integer
+    define description_x of type integer
+    define mydescription of type integer
+    define ratio of type real
+begin
+    set count_1=10*2-3/1
+    set ratio = 0.5
+    display "a // inside a string is not a comment"
+    display "the word description inside a string is fine"
+    display ""
+    if count_1==17 then display "equal" else display "not equal" endif
+    set ratio = ratio + 100.001  description inline comment */  exit
+
+
+endfun main
+
+// EXPECT: none

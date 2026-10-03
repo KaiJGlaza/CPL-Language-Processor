@@ -1,0 +1,28 @@
+description
+  Test: unknown characters.
+  Each character that cannot start any token in our subset should be
+  reported once, skipped, and scanning should continue on the same line.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define total of type integer
+    define _temp of type integer
+begin
+    set total = 10 $ 5
+    set total = total + 1;
+    display "Total: ", total @ #
+    if total != 3 then
+        set total = .5
+    endif
+    exit
+endfun main
+
+// EXPECT: Line 11: unknown character '_'
+// EXPECT: Line 13: unknown character '$'
+// EXPECT: Line 14: unknown character ';'
+// EXPECT: Line 15: unknown character '@'
+// EXPECT: Line 15: unknown character '#'
+// EXPECT: Line 16: unknown character '!'
+// EXPECT: Line 17: unknown character '.'

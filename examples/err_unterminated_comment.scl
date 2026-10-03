@@ -1,0 +1,21 @@
+description
+  Test: unterminated description comment.
+  A comment opened with the word description but never closed should be
+  reported at the line where it starts. Everything after it is swallowed
+  by the comment, so the bad character and bad string below must NOT be
+  reported.
+*/
+import "scl.h"
+implementations
+function main return type integer is
+variables
+    define x of type integer
+begin
+    set x = 1
+    description this comment is never closed
+    set x = $ 2
+    display "unterminated
+    exit
+endfun main
+
+// EXPECT: Line 15: unterminated comment (started with 'description')
