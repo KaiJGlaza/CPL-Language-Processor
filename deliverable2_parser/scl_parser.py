@@ -97,22 +97,25 @@ class SCLParser:
     Initialise with the path to an SCL source file, then call begin().
     """
 
-    def __init__(self, source_path: str):
+     def __init__(self, source_path, output_path=DEFAULT_OUTPUT):
         self._source_path = source_path
-
+        self._output_path = output_path
+ 
         # Read source and run the scanner
         with open(source_path, "r", encoding="utf-8") as fh:
             source_text = fh.read()
-
+ 
         self._id_table = IdentifierTable()
         all_tokens = scan_source(source_text, self._id_table)
-
-        # Filter out UNKNOWN tokens so the parser never sees them,
-        # then store the clean stream.
-        self._tokens = [t for t in all_tokens if t.type != "UNKNOWN"]
-        self._pos = 0          
-        self._errors: list[str] = []
-        self._output: list[str] = []  # recognised statement log
+ 
+        self._tokens = [t for t in all_tokens if t.type != UNKNOWN]
+        self._pos = 0
+        self._last_line = self._tokens[-1].line if self._tokens else None
+ 
+        self._declared = set()
+ 
+        self._errors = []
+        self._output = []   # everything printed: statements and errors
 
     # =======================================================================
     # PUBLIC INTERFACE  (three required functions)
