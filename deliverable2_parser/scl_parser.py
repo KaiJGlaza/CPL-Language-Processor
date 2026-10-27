@@ -126,33 +126,33 @@ class SCLParser:
     # =======================================================================
 
     def getNextToken(self):
-        """Return the next token that is not a comment.
-
-        Comments are already stripped by the scanner, so this simply advances
-        past any residual UNKNOWN tokens and returns the next real token,
-        or None when the stream is exhausted.
+        """Return the next token and advance, or None at end of input.
+ 
+        Comments are removed by the scanner and UNKNOWN tokens are filtered
+        out in __init__, so every token in the stream is a real token.
         """
-        while self._pos < len(self._tokens):
+        if self._pos < len(self._tokens):
             token = self._tokens[self._pos]
             self._pos += 1
             return token
         return None
-
-    def identifierExists(self, identifier: str) -> bool:
-        """Return True if *identifier* has already been declared.
-
-        Delegates to the IdentifierTable populated by the scanner.  Used to
-        catch undeclared variable references and duplicate declarations.
-        """
-        return self._id_table.exists(identifier)
-
+ 
+    def identifierExists(self, identifier):
+        """Return True if *identifier* was declared with 'define'."""
+        return identifier in self._declared
+ 
     def begin(self):
-        """Public entry point: initialise and start the parse."""
+        """Public entry point: initialise and start the parse.
+ 
+        Returns the number of syntax errors found.
+        """
         self._pos = 0
+        self._declared.clear()
         self._errors.clear()
         self._output.clear()
         self._start()
         self._finish()
+        return len(self._errors)
 
     # =======================================================================
     # INTERNAL HELPERS
