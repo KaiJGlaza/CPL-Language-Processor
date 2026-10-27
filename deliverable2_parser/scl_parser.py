@@ -30,10 +30,11 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _SCANNER_DIR = os.path.join(_HERE, "..", "deliverable1_scanner")
 if _SCANNER_DIR not in sys.path:
     sys.path.insert(0, _SCANNER_DIR)
-
+ 
+import scl_scanner
 from scl_scanner import scan_source, IdentifierTable
 from scl_token import (
-    KEYWORD, OPERATOR, IDENTIFIER, INTEGER_CONST, REAL_CONST, STRING,
+    KEYWORD, OPERATOR, IDENTIFIER, INTEGER_CONST, REAL_CONST, STRING, UNKNOWN,
     KEYWORDS, OPERATORS,
 )
 
