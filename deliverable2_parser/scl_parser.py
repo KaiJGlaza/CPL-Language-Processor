@@ -554,27 +554,27 @@ class SCLParser:
 # Module-level helpers (private to this file)
 # ===========================================================================
 
-def _kw_name(kw_id: int) -> str:
+def _kw_name(kw_id):
     """Return the keyword string for a given keyword ID."""
     for name, kid in KEYWORDS.items():
         if kid == kw_id:
             return name
     return f"<kw:{kw_id}>"
-
-
-def _op_sym(op_id: int) -> str:
+ 
+ 
+def _op_sym(op_id):
     """Return the operator string for a given operator ID."""
     for sym, oid in OPERATORS.items():
         if oid == op_id:
             return sym
     return f"<op:{op_id}>"
-
-
-def _tok_desc(tok) -> str:
+ 
+ 
+def _tok_desc(tok):
     """Return a short, printable description of a token (or 'end of file')."""
     if tok is None:
         return "end of file"
-    return f"{tok.type} '{tok.value}' (id {tok.id})"
+    return f"'{tok.value}'"
 
 
 # ===========================================================================
