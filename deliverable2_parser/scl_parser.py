@@ -101,7 +101,7 @@ class SCLParser:
     Initialise with the path to an SCL source file, then call begin().
     """
 
-     def __init__(self, source_path, output_path=DEFAULT_OUTPUT):
+    def __init__(self, source_path, output_path=DEFAULT_OUTPUT):
         self._source_path = source_path
         self._output_path = output_path
  
