@@ -582,18 +582,23 @@ def _tok_desc(tok):
 # ===========================================================================
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python scl_parser.py <source_file.scl>")
+    if len(sys.argv) not in (2, 3):
+        print("Usage: python scl_parser.py <source_file.scl> [output.txt]")
         sys.exit(2)
-
+ 
     path = sys.argv[1]
+    output_path = sys.argv[2] if len(sys.argv) == 3 else DEFAULT_OUTPUT
+ 
     if not os.path.isfile(path):
         print(f"Error: file not found: '{path}'")
         sys.exit(2)
-
-    parser = SCLParser(path)
-    parser.begin()
-
-
+ 
+    parser = SCLParser(path, output_path)
+    parse_errors = parser.begin()
+ 
+    # Non-zero exit if the parser OR the scanner found problems
+    sys.exit(1 if (parse_errors or scl_scanner.errors) else 0)
+ 
+ 
 if __name__ == "__main__":
     main()
