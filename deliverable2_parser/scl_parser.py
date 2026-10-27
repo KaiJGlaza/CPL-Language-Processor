@@ -302,8 +302,8 @@ class SCLParser:
         self._declarations()
         self.match("begin")
         self._actions("'begin' block")
-        self.match("endfun")
-        self.match("main")
+        if self.match("endfun"):
+            self.match("main")
 
     def _declarations(self):
         """<declarations> ::= <declaration> { <declaration> }"""
@@ -404,6 +404,7 @@ class SCLParser:
     def _set_stmt(self):
         """<set_stmt> ::= 'set' IDENTIFIER '=' <expression>"""
         line = self._current().line
+        errors_before = len(self._errors)
         self.match("set")
 
         name_tok = self.match(IDENTIFIER)
@@ -412,13 +413,14 @@ class SCLParser:
         self.match("=")
         val = self._expression()
 
-        if name_tok:
+        if name_tok and len(self._errors) == errors_before:
             self._log(f"Statement recognized (line {line}): "
                       f"set {name_tok.value} = {val}")
 
     def _display_stmt(self):
         """<display_stmt> ::= 'display' <display_item> { ',' <display_item> }"""
         line = self._current().line
+        errors_before = len(self._errors)
         self.match("display")
 
         items = [self._display_item()]
@@ -428,8 +430,9 @@ class SCLParser:
             self._consume()  # eat ','
             items.append(self._display_item())
 
-        self._log(f"Statement recognized (line {line}): "
-                  f"display {', '.join(items)}")
+        if len(self._errors) == errors_before:
+            self._log(f"Statement recognized (line {line}): "
+                      f"display {', '.join(items)}")
 
     def _display_item(self):
         """<display_item> ::= STRING | <expression>"""
@@ -442,6 +445,7 @@ class SCLParser:
     def _input_stmt(self):
         """<input_stmt> ::= 'input' STRING ',' IDENTIFIER"""
         line = self._current().line
+        errors_before = len(self._errors)
         self.match("input")
 
         prompt_tok = self.match(STRING)
@@ -449,16 +453,19 @@ class SCLParser:
         name_tok = self.match(IDENTIFIER)
         self._check_declared(name_tok)
 
-        if prompt_tok and name_tok:
+        if (prompt_tok and name_tok
+                and len(self._errors) == errors_before):
             self._log(f"Statement recognized (line {line}): "
                       f"input \"{prompt_tok.value}\", {name_tok.value}")
 
     def _return_stmt(self):
         """<return_stmt> ::= 'return' <expression>"""
         line = self._current().line
+        errors_before = len(self._errors)
         self.match("return")
         val = self._expression()
-        self._log(f"Statement recognized (line {line}): return {val}")
+        if len(self._errors) == errors_before:
+            self._log(f"Statement recognized (line {line}): return {val}")
 
     def _exit_stmt(self):
         """<exit_stmt> ::= 'exit'"""
@@ -475,11 +482,13 @@ class SCLParser:
         whenever it sees another 'if'.
         """
         line = self._current().line
+        errors_before = len(self._errors)
         self.match("if")
         cond = self._condition()
         self.match("then")
 
-        self._log(f"Statement recognized (line {line}): if {cond} then")
+        if len(self._errors) == errors_before:
+            self._log(f"Statement recognized (line {line}): if {cond} then")
         self._actions("'then' branch")
 
         tok = self._current()
@@ -488,8 +497,8 @@ class SCLParser:
             self._log(f"  else (line {tok.line})")
             self._actions("'else' branch")
 
-        self.match("endif")
-        self._log(f"  endif (closing if at line {line})")
+        if self.match("endif"):
+            self._log(f"  endif (closing if at line {line})")
 
     # =======================================================================
     # EXPRESSION / CONDITION
@@ -549,7 +558,7 @@ class SCLParser:
             op_sym = self._consume().value
         else:
             self.error("relational operator ('>', '<', '==')", tok)
-            op_sym = "?"
+            return f"{left} ?"   # skip the right side: one mistake, one error
 
         right = self._expression()
         return f"{left} {op_sym} {right}"
