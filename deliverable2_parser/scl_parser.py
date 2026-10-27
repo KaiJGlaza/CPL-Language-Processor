@@ -490,12 +490,11 @@ class SCLParser:
     # EXPRESSION / CONDITION  (called by the statement parsers above)
     # =======================================================================
 
-    def _expression(self) -> str:
+    def _expression(self):
         """<expression> ::= <term> { ( '+' | '-' ) <term> }
-
-        Returns a human-readable string representation of the expression
-        (used for logging).  Until a full evaluator is wired up, this acts
-        as a plain-constant / identifier expression validator.
+ 
+        Returns a readable string (used for logging).  A tree return value
+        for Deliverable 3 can replace this later.
         """
         parts = [self._term()]
         while (self._current() and
@@ -505,8 +504,8 @@ class SCLParser:
             parts.append(op_tok.value)
             parts.append(self._term())
         return " ".join(parts)
-
-    def _term(self) -> str:
+ 
+    def _term(self):
         """<term> ::= <factor> { ( '*' | '/' ) <factor> }"""
         parts = [self._factor()]
         while (self._current() and
@@ -516,53 +515,37 @@ class SCLParser:
             parts.append(op_tok.value)
             parts.append(self._factor())
         return " ".join(parts)
-
-    def _factor(self) -> str:
-        """<factor> ::= IDENTIFIER | INTEGER_CONST | REAL_CONST
-
-        Verifies that an IDENTIFIER was declared before it is used.
-        """
+ 
+    def _factor(self):
+        """<factor> ::= IDENTIFIER | INTEGER_CONST | REAL_CONST"""
         tok = self._current()
-        if tok is None:
-            self._parse_error("unexpected end of file in expression")
-            return "<eof>"
-
-        if tok.type == IDENTIFIER:
+ 
+        if tok is not None and tok.type == IDENTIFIER:
             self._consume()
-            if not self.identifierExists(tok.value):
-                self._parse_error(
-                    f"undeclared variable '{tok.value}'", tok.line
-                )
+            self._check_declared(tok)
             return tok.value
-
-        if tok.type in (INTEGER_CONST, REAL_CONST):
+ 
+        if tok is not None and tok.type in (INTEGER_CONST, REAL_CONST):
             self._consume()
             return tok.value
-
-        self._parse_error(
-            f"expected identifier or number in expression, got {_tok_desc(tok)}",
-            tok.line,
-        )
+ 
+        self._expected("identifier or number", tok)
         return "<error>"
-
-    def _condition(self) -> str:
+ 
+    def _condition(self):
         """<condition> ::= <expression> <rel_op> <expression>
-
+ 
         <rel_op> ::= '>' | '<' | '=='
         """
         left = self._expression()
         tok = self._current()
-
+ 
         if tok and tok.type == OPERATOR and tok.id in (_OP_GT, _OP_LT, _OP_EQ):
             op_sym = self._consume().value
         else:
-            got = _tok_desc(tok)
-            self._parse_error(
-                f"expected relational operator ('>', '<', '=='), got {got}",
-                tok.line if tok else None,
-            )
+            self._expected("relational operator ('>', '<', '==')", tok)
             op_sym = "?"
-
+ 
         right = self._expression()
         return f"{left} {op_sym} {right}"
 
