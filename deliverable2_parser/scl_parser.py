@@ -48,23 +48,23 @@ _KW_FUNCTION = KEYWORDS["function"]         # 3
 _KW_MAIN     = KEYWORDS["main"]             # 4
 _KW_RETURN   = KEYWORDS["return"]           # 5
 _KW_TYPE     = KEYWORDS["type"]             # 6
-_KW_IS       = KEYWORDS["is"]              # 7
+_KW_IS       = KEYWORDS["is"]               # 7
 _KW_VARS     = KEYWORDS["variables"]        # 8
 _KW_BEGIN    = KEYWORDS["begin"]            # 9
-_KW_ENDFUN   = KEYWORDS["endfun"]          # 10
-_KW_DEFINE   = KEYWORDS["define"]          # 11
-_KW_OF       = KEYWORDS["of"]              # 12
-_KW_INTEGER  = KEYWORDS["integer"]         # 13
-_KW_REAL     = KEYWORDS["real"]            # 14
-_KW_SET      = KEYWORDS["set"]             # 15
-_KW_DISPLAY  = KEYWORDS["display"]         # 16
-_KW_INPUT    = KEYWORDS["input"]           # 17
-_KW_EXIT     = KEYWORDS["exit"]            # 18
-_KW_IF       = KEYWORDS["if"]              # 19
-_KW_THEN     = KEYWORDS["then"]            # 20
-_KW_ELSE     = KEYWORDS["else"]            # 21
-_KW_ENDIF    = KEYWORDS["endif"]           # 22
-
+_KW_ENDFUN   = KEYWORDS["endfun"]           # 10
+_KW_DEFINE   = KEYWORDS["define"]           # 11
+_KW_OF       = KEYWORDS["of"]               # 12
+_KW_INTEGER  = KEYWORDS["integer"]          # 13
+_KW_REAL     = KEYWORDS["real"]             # 14
+_KW_SET      = KEYWORDS["set"]              # 15
+_KW_DISPLAY  = KEYWORDS["display"]          # 16
+_KW_INPUT    = KEYWORDS["input"]            # 17
+_KW_EXIT     = KEYWORDS["exit"]             # 18
+_KW_IF       = KEYWORDS["if"]               # 19
+_KW_THEN     = KEYWORDS["then"]             # 20
+_KW_ELSE     = KEYWORDS["else"]             # 21
+_KW_ENDIF    = KEYWORDS["endif"]            # 22
+ 
 _OP_ASSIGN = OPERATORS["="]   # 101
 _OP_PLUS   = OPERATORS["+"]   # 102
 _OP_MINUS  = OPERATORS["-"]   # 103
@@ -74,8 +74,20 @@ _OP_GT     = OPERATORS[">"]   # 106
 _OP_LT     = OPERATORS["<"]   # 107
 _OP_EQ     = OPERATORS["=="]  # 108
 _OP_COMMA  = OPERATORS[","]   # 109
-
-
+ 
+# Keywords that end a block (not consumed by _actions)
+_TERMINATORS = {_KW_ENDFUN, _KW_ELSE, _KW_ENDIF}
+ 
+# Keywords that can start a statement
+_STATEMENT_STARTS = {_KW_SET, _KW_DISPLAY, _KW_INPUT,
+                     _KW_RETURN, _KW_EXIT, _KW_IF}
+ 
+# Safe places to resume parsing after a syntax error
+_SYNC_POINTS = _STATEMENT_STARTS | _TERMINATORS
+ 
+DEFAULT_OUTPUT = "ParserOutput.txt"
+ 
+ 
 # ===========================================================================
 # SCLParser
 # ===========================================================================
