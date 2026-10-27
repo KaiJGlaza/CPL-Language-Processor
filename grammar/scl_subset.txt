@@ -33,6 +33,8 @@ Syntax Rules
                   | <input_stmt>
                   | <if_stmt>
                   | <exit_stmt>
+		  | <return_stmt>
+			
 
 <set_stmt>      ::= "set" IDENTIFIER "=" <expression>
 <display_stmt>  ::= "display" <display_item> { "," <display_item> }
@@ -42,6 +44,7 @@ Syntax Rules
                     [ "else" <statements> ]
                     "endif"
 <exit_stmt>     ::= "exit"
+<return_stmt>   ::= "return" <expression>
 
 <condition>     ::= <expression> <rel_op> <expression>
 <rel_op>        ::= ">" | "<" | "=="
