@@ -338,29 +338,34 @@ class SCLParser:
     # actions() and all statement parsers
     # =======================================================================
 
-    def _actions(self):
+    def _actions(self, block_name="block"):
         """Read and parse statements until 'endfun', 'else', or 'endif'.
-
-        <actions> ::= { <statement> }
-
-        Stops (without consuming) when the next token is one of the
-        block-terminator keywords: endfun, else, endif.
+ 
+        <statements> ::= <statement> { <statement> }
+ 
+        Stops (without consuming) at a block terminator.  The grammar
+        requires at least one statement, so an empty block is an error.
+        After any error the parser resynchronizes at the next statement
+        keyword or terminator.
         """
-        _TERMINATORS = {_KW_ENDFUN, _KW_ELSE, _KW_ENDIF}
-
+        attempted = False
+ 
         while True:
             tok = self._current()
-
+ 
             # End of token stream
             if tok is None:
                 break
-
-            # Block terminator – stop but do NOT consume
+ 
+            # Block terminator - stop but do NOT consume
             if tok.type == KEYWORD and tok.id in _TERMINATORS:
                 break
-
-            # Dispatch on the leading keyword
-            if tok.type == KEYWORD:
+ 
+            attempted = True
+ 
+            if tok.type == KEYWORD and tok.id in _STATEMENT_STARTS:
+                errors_before = len(self._errors)
+ 
                 if tok.id == _KW_SET:
                     self._set_stmt()
                 elif tok.id == _KW_DISPLAY:
@@ -371,22 +376,21 @@ class SCLParser:
                     self._return_stmt()
                 elif tok.id == _KW_EXIT:
                     self._exit_stmt()
-                elif tok.id == _KW_IF:
-                    self._if_stmt()
                 else:
-                    # Unexpected keyword inside an action block
-                    self._parse_error(
-                        f"unexpected keyword '{tok.value}' in action block",
-                        tok.line,
-                    )
-                    self._consume()   # skip it and keep going
+                    self._if_stmt()
+ 
+                # The statement had an error: skip to a safe place
+                if len(self._errors) > errors_before:
+                    self._synchronize()
             else:
-                # Non-keyword token with no leading statement keyword
-                self._parse_error(
-                    f"expected a statement keyword, got {_tok_desc(tok)}",
-                    tok.line,
-                )
+                # Stray token that cannot start a statement
+                self._expected("a statement", tok)
                 self._consume()
+                self._synchronize()
+ 
+        if not attempted:
+            self._expected(f"at least one statement in {block_name}",
+                           self._current())
 
     # -----------------------------------------------------------------------
     # Individual statement parsers
