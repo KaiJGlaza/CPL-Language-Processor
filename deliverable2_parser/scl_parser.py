@@ -397,123 +397,92 @@ class SCLParser:
     # -----------------------------------------------------------------------
 
     def _set_stmt(self):
-        """<set_stmt> ::= 'set' IDENTIFIER '=' <expression>
-
-        Verifies that the target variable was declared before use.
-        """
+        """<set_stmt> ::= 'set' IDENTIFIER '=' <expression>"""
         line = self._current().line
         self._expect_keyword(_KW_SET)
-
+ 
         name_tok = self._expect_identifier()
-        if name_tok and not self.identifierExists(name_tok.value):
-            self._parse_error(
-                f"undeclared variable '{name_tok.value}'", name_tok.line
-            )
-
+        self._check_declared(name_tok)
+ 
         self._expect_operator(_OP_ASSIGN)
         val = self._expression()
-
+ 
         if name_tok:
-            self._log(
-                f"Statement recognized (line {line}): "
-                f"set {name_tok.value} = {val}"
-            )
-
+            self._log(f"Statement recognized (line {line}): "
+                      f"set {name_tok.value} = {val}")
+ 
     def _display_stmt(self):
-        """<display_stmt> ::= 'display' <display_item> { ',' <display_item> }
-
-        <display_item> ::= STRING | <expression>
-        """
+        """<display_stmt> ::= 'display' <display_item> { ',' <display_item> }"""
         line = self._current().line
         self._expect_keyword(_KW_DISPLAY)
-
+ 
         items = [self._display_item()]
         while (self._current() and
                self._current().type == OPERATOR and
                self._current().id == _OP_COMMA):
             self._consume()  # eat ','
             items.append(self._display_item())
-
-        self._log(
-            f"Statement recognized (line {line}): "
-            f"display {', '.join(str(i) for i in items)}"
-        )
-
-    def _display_item(self) -> str:
-        """Parse and return a display item (STRING or expression)."""
+ 
+        self._log(f"Statement recognized (line {line}): "
+                  f"display {', '.join(items)}")
+ 
+    def _display_item(self):
+        """<display_item> ::= STRING | <expression>"""
         tok = self._current()
         if tok and tok.type == STRING:
             self._consume()
             return f'"{tok.value}"'
-        return str(self._expression())
-
+        return self._expression()
+ 
     def _input_stmt(self):
-        """<input_stmt> ::= 'input' STRING ',' IDENTIFIER
-
-        The prompt string is displayed to the user and the value is stored
-        in the named variable (which must have been declared).
-        """
+        """<input_stmt> ::= 'input' STRING ',' IDENTIFIER"""
         line = self._current().line
         self._expect_keyword(_KW_INPUT)
-
+ 
         prompt_tok = self._expect_string()
         self._expect_operator(_OP_COMMA)
         name_tok = self._expect_identifier()
-
-        if name_tok and not self.identifierExists(name_tok.value):
-            self._parse_error(
-                f"undeclared variable '{name_tok.value}'", name_tok.line
-            )
-
+        self._check_declared(name_tok)
+ 
         if prompt_tok and name_tok:
-            self._log(
-                f"Statement recognized (line {line}): "
-                f"input \"{prompt_tok.value}\", {name_tok.value}"
-            )
-
+            self._log(f"Statement recognized (line {line}): "
+                      f"input \"{prompt_tok.value}\", {name_tok.value}")
+ 
     def _return_stmt(self):
-        """<return_stmt> ::= 'return' <expression>
-
-        Returns a value from the current function.
-        """
+        """<return_stmt> ::= 'return' <expression>"""
         line = self._current().line
         self._expect_keyword(_KW_RETURN)
         val = self._expression()
-        self._log(
-            f"Statement recognized (line {line}): return {val}"
-        )
-
+        self._log(f"Statement recognized (line {line}): return {val}")
+ 
     def _exit_stmt(self):
-        """<exit_stmt> ::= 'exit'
-
-        Terminates the program immediately.
-        """
+        """<exit_stmt> ::= 'exit'"""
         line = self._current().line
         self._expect_keyword(_KW_EXIT)
         self._log(f"Statement recognized (line {line}): exit")
-
+ 
     def _if_stmt(self):
-        """<if_stmt> ::= 'if' <condition> 'then' <actions>
-                         [ 'else' <actions> ]
+        """<if_stmt> ::= 'if' <condition> 'then' <statements>
+                         [ 'else' <statements> ]
                          'endif'
-
-        Supports nesting to any depth because _actions() calls _if_stmt()
-        recursively when it encounters another 'if'.
+ 
+        Nests to any depth because _actions() calls _if_stmt() again
+        whenever it sees another 'if'.
         """
         line = self._current().line
         self._expect_keyword(_KW_IF)
         cond = self._condition()
         self._expect_keyword(_KW_THEN)
-
+ 
         self._log(f"Statement recognized (line {line}): if {cond} then")
-        self._actions()  # 'then' branch – recurses for nested ifs
-
+        self._actions("'then' branch")
+ 
         tok = self._current()
         if tok and tok.type == KEYWORD and tok.id == _KW_ELSE:
             self._consume()
             self._log(f"  else (line {tok.line})")
-            self._actions()  # 'else' branch
-
+            self._actions("'else' branch")
+ 
         self._expect_keyword(_KW_ENDIF)
         self._log(f"  endif (closing if at line {line})")
 
