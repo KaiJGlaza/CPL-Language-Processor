@@ -270,14 +270,19 @@ class SCLParser:
         self._import_stmt()
         self._expect_keyword(_KW_IMPL)
         self._function_def()
-
+ 
+        # Nothing may follow 'endfun main'
+        extra = self._current()
+        if extra is not None:
+            self._expected("end of file after 'endfun main'", extra)
+ 
     def _import_stmt(self):
         """<import> ::= 'import' STRING"""
         self._expect_keyword(_KW_IMPORT)
         tok = self._expect_string()
         if tok:
             self._log(f"Statement recognized: import \"{tok.value}\"")
-
+ 
     def _function_def(self):
         """<function> ::= 'function' 'main' 'return' 'type' <type>
                           'is' 'variables' <declarations>
@@ -291,10 +296,10 @@ class SCLParser:
         self._expect_keyword(_KW_VARS)
         self._declarations()
         self._expect_keyword(_KW_BEGIN)
-        self._actions()          # ← YOUR section starts here
+        self._actions("'begin' block")
         self._expect_keyword(_KW_ENDFUN)
         self._expect_keyword(_KW_MAIN)
-
+ 
     def _declarations(self):
         """<declarations> ::= <declaration> { <declaration> }"""
         self._declaration()
@@ -302,7 +307,7 @@ class SCLParser:
                self._current().type == KEYWORD and
                self._current().id == _KW_DEFINE):
             self._declaration()
-
+ 
     def _declaration(self):
         """<declaration> ::= 'define' IDENTIFIER 'of' 'type' <type>"""
         self._expect_keyword(_KW_DEFINE)
@@ -311,17 +316,22 @@ class SCLParser:
         self._expect_keyword(_KW_TYPE)
         type_name = self._type()
         if tok:
-            self._log(f"Statement recognized: define {tok.value} of type {type_name}")
-
-    def _type(self) -> str:
+            if tok.value in self._declared:
+                self._parse_error(
+                    f"duplicate declaration of '{tok.value}'", tok.line
+                )
+            else:
+                self._declared.add(tok.value)
+                self._log(f"Statement recognized: "
+                          f"define {tok.value} of type {type_name}")
+ 
+    def _type(self):
         """<type> ::= 'integer' | 'real'"""
         tok = self._current()
         if tok and tok.type == KEYWORD and tok.id in (_KW_INTEGER, _KW_REAL):
             self._consume()
             return tok.value
-        got = _tok_desc(tok)
-        self._parse_error(f"expected type ('integer' or 'real'), got {got}",
-                          tok.line if tok else None)
+        self._expected("type ('integer' or 'real')", tok)
         return "unknown"
 
     # =======================================================================
