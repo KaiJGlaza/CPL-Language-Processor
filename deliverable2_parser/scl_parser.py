@@ -10,12 +10,16 @@ internally, then walks the token stream according to grammar/scl_subset.txt.
 Grammar extended for this deliverable:
     <statement>  ::= <set_stmt> | <display_stmt> | <input_stmt>
                    | <if_stmt>  | <exit_stmt>    | <return_stmt>
+    <return_stmt> ::= "return" <expression>
 
 Public API (three required functions):
     getNextToken()              – next non-comment token
     identifierExists(name)      – True if name was declared
     begin()                     – start the parse
 
+Error format (from the team plan):
+    Syntax error (line N): expected X, found Y
+    
 Usage:
     python scl_parser.py <source_file.scl>
 """
