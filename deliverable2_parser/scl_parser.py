@@ -163,77 +163,103 @@ class SCLParser:
         if self._pos < len(self._tokens):
             return self._tokens[self._pos]
         return None
-
+ 
     def _consume(self):
-        """Consume and return the current token."""
-        tok = self._tokens[self._pos]
-        self._pos += 1
-        return tok
-
-    def _expect_keyword(self, kw_id: int) -> bool:
+        """Consume and return the current token (via getNextToken)."""
+        return self.getNextToken()
+ 
+    def _synchronize(self):
+        """Skip tokens until a statement keyword or block terminator.
+ 
+        Called after a syntax error so one mistake does not trigger a
+        pile of follow-on errors.  Does not consume the sync token.
+        """
+        while True:
+            tok = self._current()
+            if tok is None:
+                return
+            if tok.type == KEYWORD and tok.id in _SYNC_POINTS:
+                return
+            self.getNextToken()
+ 
+    def _expected(self, what, tok):
+        """Report: expected <what>, found <token>."""
+        self._parse_error(f"expected {what}, found {_tok_desc(tok)}",
+                          tok.line if tok else None)
+ 
+    def _expect_keyword(self, kw_id):
         """Consume the current token if it is keyword *kw_id*, else error."""
         tok = self._current()
-        kw_name = _kw_name(kw_id)
         if tok and tok.type == KEYWORD and tok.id == kw_id:
             self._consume()
             return True
-        got = _tok_desc(tok)
-        self._parse_error(f"expected keyword '{kw_name}', got {got}",
-                          tok.line if tok else None)
+        self._expected(f"'{_kw_name(kw_id)}'", tok)
         return False
-
-    def _expect_operator(self, op_id: int) -> bool:
+ 
+    def _expect_operator(self, op_id):
         """Consume the current token if it is operator *op_id*, else error."""
         tok = self._current()
-        op_sym = _op_sym(op_id)
         if tok and tok.type == OPERATOR and tok.id == op_id:
             self._consume()
             return True
-        got = _tok_desc(tok)
-        self._parse_error(f"expected operator '{op_sym}', got {got}",
-                          tok.line if tok else None)
+        self._expected(f"'{_op_sym(op_id)}'", tok)
         return False
-
+ 
     def _expect_identifier(self):
         """Consume and return an IDENTIFIER token, or error and return None."""
         tok = self._current()
         if tok and tok.type == IDENTIFIER:
             self._consume()
             return tok
-        got = _tok_desc(tok)
-        self._parse_error(f"expected identifier, got {got}",
-                          tok.line if tok else None)
+        self._expected("identifier", tok)
         return None
-
+ 
     def _expect_string(self):
         """Consume and return a STRING token, or error and return None."""
         tok = self._current()
         if tok and tok.type == STRING:
             self._consume()
             return tok
-        got = _tok_desc(tok)
-        self._parse_error(f"expected string literal, got {got}",
-                          tok.line if tok else None)
+        self._expected("string literal", tok)
         return None
-
-    def _parse_error(self, message: str, line=None):
-        loc = f"line {line}: " if line else ""
-        full = f"PARSE ERROR – {loc}{message}"
+ 
+    def _parse_error(self, message, line=None):
+        """Record and print one syntax error, then keep parsing."""
+        if line is None:
+            line = self._last_line
+        loc = f" (line {line})" if line else ""
+        full = f"Syntax error{loc}: {message}"
         self._errors.append(full)
+        self._output.append(full)
         print(full)
-
-    def _log(self, message: str):
+ 
+    def _log(self, message):
         """Record and print a recognised-statement message."""
         self._output.append(message)
         print(message)
-
+ 
+    def _check_declared(self, tok):
+        """Report an undeclared variable use."""
+        if tok and not self.identifierExists(tok.value):
+            self._parse_error(f"undeclared variable '{tok.value}'", tok.line)
+ 
     def _finish(self):
-        """Print the final parse summary."""
-        print()
+        """Print the final summary and write the output file."""
         if self._errors:
-            print(f"Parse finished with {len(self._errors)} error(s).")
+            summary = f"Parse finished with {len(self._errors)} error(s)."
         else:
-            print("Parse completed successfully – no errors.")
+            summary = "Parse completed successfully - no errors."
+        print()
+        print(summary)
+        self._output.append("")
+        self._output.append(summary)
+ 
+        try:
+            with open(self._output_path, "w", encoding="utf-8") as out:
+                out.write("\n".join(self._output) + "\n")
+            print(f"Parser output saved to {self._output_path}")
+        except OSError as problem:
+            print(f"Could not write '{self._output_path}': {problem}")
 
     # =======================================================================
     # STRUCTURAL PARSE METHODS  
