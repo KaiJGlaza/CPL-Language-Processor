@@ -33,8 +33,7 @@ Syntax Rules
                   | <input_stmt>
                   | <if_stmt>
                   | <exit_stmt>
-		  | <return_stmt>
-			
+                  | <return_stmt>
 
 <set_stmt>      ::= "set" IDENTIFIER "=" <expression>
 <display_stmt>  ::= "display" <display_item> { "," <display_item> }
