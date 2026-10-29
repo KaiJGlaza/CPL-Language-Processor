@@ -1,0 +1,21 @@
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+  define y of type real
+begin
+ set x = 1 + 2 * 3
+ display "x is ", x
+ input "enter", y
+ if x > 2 then
+  if y < 1.5 then
+   exit
+  else
+   set y = y - 1
+  endif
+ else
+  display "small"
+ endif
+ return x
+endfun main
