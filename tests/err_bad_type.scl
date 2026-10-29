@@ -1,13 +1,13 @@
-// Declarations test (invalid): 'string' is not a type in our subset.
-// Expect one error on line 7; 'size' and the statements still parse.
 import "stdio"
 implementations
 function main return type integer is
 variables
-    define name of type string
-    define size of type integer
+
+
+define name of type string
+define size of type integer
 begin
-    set size = 3
-    display size
-    exit
+set size = 3
+display size
+exit
 endfun main
