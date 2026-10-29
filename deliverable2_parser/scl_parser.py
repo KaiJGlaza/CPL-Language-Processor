@@ -172,18 +172,16 @@ class SCLParser:
         """Consume and return the current token (via getNextToken)."""
         return self.getNextToken()
 
-    def _synchronize(self, stop_at=_SYNC_POINTS):
-        """Skip tokens until a keyword in *stop_at* (by default a statement
-        keyword or block terminator).
-
-        Called after a syntax error so one mistake does not trigger a
-        pile of follow-on errors.  Does not consume the sync token.
+    def _synchronize(self, stops=None):
+        """Skip tokens until a safe place to resume parsing.
         """
+        if stops is None:
+            stops = _SYNC_POINTS
         while True:
             tok = self._current()
             if tok is None:
                 return
-            if tok.type == KEYWORD and tok.id in stop_at:
+            if tok.type == KEYWORD and tok.id in stops:
                 return
             self.getNextToken()
 
@@ -198,15 +196,11 @@ class SCLParser:
                           found.line if found else None)
 
     def match(self, expected):
-        """Consume the current token if it fits *expected*, else error().
-
+        """
         *expected* is one of:
             a keyword such as "set" or "endif"
             an operator such as "=" or ","
             IDENTIFIER or STRING (a token type from scl_token.py)
-
-        Returns the consumed token, or None if it did not fit.  Every
-        part of the parser goes through this method.
         """
         tok = self._current()
 
@@ -315,16 +309,17 @@ class SCLParser:
             self._declaration()
 
     def _declaration(self):
-        """<declaration> ::= 'define' IDENTIFIER 'of' 'type' <type>"""
+        """<declaration> ::= 'define' IDENTIFIER 'of' 'type' <type>
+        """
         errors_before = len(self._errors)
         tok = None
+        type_name = "unknown"
+
         if self.match("define"):
             tok = self.match(IDENTIFIER)
         if tok and self.match("of") and self.match("type"):
             type_name = self._type()
 
-        # One bad define = one error: stop at the first wrong token and
-        # resume at the next 'define' or at 'begin'.
         if len(self._errors) > errors_before:
             self._synchronize({_KW_DEFINE, _KW_BEGIN})
             return
