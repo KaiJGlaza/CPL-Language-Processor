@@ -1,0 +1,11 @@
+import "stdio"
+implementations
+function main return type integer is
+variables
+    define x of type integer
+    define x of type real
+begin
+    set x = 1
+    display x
+    exit
+endfun main
