@@ -11,8 +11,8 @@ three stages:
 
 | Deliverable | Component   | Language | Status      |
 |-------------|-------------|----------|-------------|
-| 1           | Scanner     | Python   | In progress |
-| 2           | Parser      | Python   | Not started |
+| 1           | Scanner     | Python   | Completed |
+| 2           | Parser      | Python   | In Progress |
 | 3           | Interpreter | [Java]???| Not started |
 
 ## How It Works
@@ -31,7 +31,7 @@ SCL program (.scl) -> Scanner -> Parser -> Interpreter
 
 ```
 grammar/                  BNF/EBNF grammar of the SCL subset
-examples/                 SCL test programs (inputs)
+tests/                 SCL test programs (inputs)
 deliverable1_scanner/     Scanner (Python)
 deliverable2_parser/      Parser (Python)
 deliverable3_interpreter/ Interpreter ([Java])
@@ -49,7 +49,7 @@ Prints the tokens to the console and writes them to a JSON file
 
 **Parser**
 ```
-python deliverable2_parser/scl_parser.py examples/examplefile.scl
+python deliverable2_parser/scl_parser.py tests/examplefile.scl
 ```
 
 **Interpreter**
