@@ -1,0 +1,12 @@
+// Test: undeclared variables. EXPECT: 2 errors (z as a set target, q inside an expression)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  set z = 2
+  display x + q
+  exit
+endfun main

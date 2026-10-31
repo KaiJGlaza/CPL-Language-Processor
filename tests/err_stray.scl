@@ -1,0 +1,11 @@
+// Test: a token that cannot start a statement. EXPECT: 1 error (expected a statement, found 5)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  5
+  exit
+endfun main

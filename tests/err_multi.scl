@@ -1,0 +1,16 @@
+// Test: several separate mistakes; parser must report all and keep going
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+  define y of type integer
+begin
+  set x 5
+  set y = x + * 2
+  if x then
+    display "a"
+  endif
+  set w = 3
+  exit
+endfun main

@@ -1,0 +1,14 @@
+// Test: empty then branch. EXPECT: 1 error (at least one statement in then branch, found else)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  if x > 0 then
+  else
+    display "not positive"
+  endif
+  exit
+endfun main
