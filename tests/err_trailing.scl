@@ -1,0 +1,11 @@
+// Test: tokens after "endfun main". EXPECT: 1 error (expected end of file, found display)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  exit
+endfun main
+display "extra"
