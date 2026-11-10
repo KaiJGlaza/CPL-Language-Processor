@@ -11,9 +11,9 @@ three stages:
 
 | Deliverable | Component   | Language | Status      |
 |-------------|-------------|----------|-------------|
-| 1           | Scanner     | Python   | Submitted   |
-| 2           | Parser      | Python   | In progress |
-| 3           | Interpreter | TBD      | Not started |
+| 1           | Scanner     | Python   | Completed |
+| 2           | Parser      | Python   | Completed |
+| 3           | Interpreter | Java| In Progress |
 
 ## How It Works
 
@@ -31,8 +31,7 @@ SCL program (.scl) -> Scanner -> Parser -> Interpreter
 
 ```
 grammar/                  BNF/EBNF grammar of the SCL subset
-examples/                 SCL test programs from Deliverable 1
-tests/                    SCL test programs for the parser
+tests/                 SCL test programs (inputs)
 deliverable1_scanner/     Scanner (Python)
 deliverable2_parser/      Parser (Python)
 deliverable3_interpreter/ Interpreter
@@ -50,7 +49,7 @@ Prints the tokens to the console and writes them to a JSON file
 
 **Parser**
 ```
-python deliverable2_parser/scl_parser.py tests/valid_declarations.scl [output.txt]
+python deliverable2_parser/scl_parser.py tests/examplefile.scl
 ```
 Prints each recognized statement and every syntax error, then saves the
 same lines to the output file (ParserOutput.txt if none is given).
@@ -67,4 +66,4 @@ and nested `if`/`else`/`endif`.
 ## Requirements
 
 - Python 3.x
-- Deliverable 3 must use a language not used in Deliverables 1 and 2 (not chosen yet)
+- [Java JDK, for Deliverable 3] ???
