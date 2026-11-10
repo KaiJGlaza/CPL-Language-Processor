@@ -1,0 +1,26 @@
+// Test (valid): every statement type, if/else nested three deep
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define n of type integer
+  define total of type real
+begin
+  input "Enter n", n
+  set total = 0.5
+  display "n is ", n, " total is ", total
+  if n > 0 then
+    if n < 10 then
+      if n == 5 then
+        display "five"
+      else
+        set n = n + 1
+      endif
+    else
+      display "ten or more"
+    endif
+  else
+    exit
+  endif
+  return n
+endfun main

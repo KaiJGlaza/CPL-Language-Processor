@@ -1,0 +1,23 @@
+// Test (valid): precedence and chained expressions
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define a of type integer
+  define b of type integer
+  define c of type integer
+  define r of type real
+begin
+  set a = 1 + 2 * 3
+  set b = a * 4 - 6 / 2 + 1
+  set c = a + b * a - b
+  set r = 1.5 * a / 2 - 0.25
+  display a + b * c, " and ", r
+  if a + b * c > b - c / 2 then
+    display "bigger"
+  endif
+  if a * 2 == b + 1 then
+    display "equal"
+  endif
+  return a * 2 + 1
+endfun main

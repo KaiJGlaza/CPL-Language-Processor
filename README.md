@@ -1,6 +1,6 @@
 # SCL Interpreter
 
-**Course:** CS 4308 – Concepts of Programming Languages, Section [XX]
+**Course:** CS 4308 – Concepts of Programming Languages, Section W02
 **Institution:** Kennesaw State University
 **Team:** Kai Glaza, Logan Nelson, Vlad Kuskov, David Ripley
 ## Overview
@@ -34,7 +34,7 @@ grammar/                  BNF/EBNF grammar of the SCL subset
 tests/                 SCL test programs (inputs)
 deliverable1_scanner/     Scanner (Python)
 deliverable2_parser/      Parser (Python)
-deliverable3_interpreter/ Interpreter ([Java])
+deliverable3_interpreter/ Interpreter
 reports/                  Written reports for each deliverable
 screenshots/              Screenshots of program runs
 ```
@@ -51,15 +51,17 @@ Prints the tokens to the console and writes them to a JSON file
 ```
 python deliverable2_parser/scl_parser.py tests/examplefile.scl
 ```
+Prints each recognized statement and every syntax error, then saves the
+same lines to the output file (ParserOutput.txt if none is given).
 
 **Interpreter**
 Instructions will be added with Deliverable 3.
 
 ## Supported SCL Subset
 
-See `grammar/scl_subset.txt` for the full grammar. Currently planned:
-imports, function declarations, variable definitions, `set`, `display`,
-`input`, `exit`, and [if / while].
+See `grammar/scl_subset.txt` for the full grammar: an import, `function main`,
+`define` with integer or real, `set`, `display`, `input`, `return`, `exit`,
+and nested `if`/`else`/`endif`.
 
 ## Requirements
 

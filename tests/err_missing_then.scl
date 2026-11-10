@@ -1,0 +1,12 @@
+// Test: if with no "then". EXPECT: 1 error (expected then, found exit)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  if x > 0
+    exit
+  endif
+endfun main

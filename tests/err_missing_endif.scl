@@ -1,0 +1,11 @@
+// Test: if with no "endif". EXPECT: 1 error (expected endif, found endfun)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define x of type integer
+begin
+  set x = 1
+  if x > 0 then
+    display "positive"
+endfun main

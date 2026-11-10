@@ -1,0 +1,14 @@
+// Test: malformed expressions. EXPECT: 3 errors (dangling +, leading *, missing relational operator)
+import "stdio"
+implementations
+function main return type integer is
+variables
+  define a of type integer
+  define b of type integer
+begin
+  set a = 1 +
+  set b = * 3
+  if a then
+    exit
+  endif
+endfun main

@@ -1,0 +1,20 @@
+// Declarations test (valid): integer and real defines, each one used later
+import "stdio"
+implementations
+function main return type integer is
+variables
+    define count of type integer
+    define limit of type integer
+    define rate of type real
+    define total of type real
+begin
+    set count = 0
+    set limit = 10
+    set rate = 2.5
+    input "Enter a count", count
+    set total = count * rate
+    if count < limit then
+        display "total: ", total
+    endif
+    exit
+endfun main
