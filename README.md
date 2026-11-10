@@ -12,8 +12,8 @@ three stages:
 | Deliverable | Component   | Language | Status      |
 |-------------|-------------|----------|-------------|
 | 1           | Scanner     | Python   | Completed |
-| 2           | Parser      | Python   | In Progress |
-| 3           | Interpreter | [Java]???| Not started |
+| 2           | Parser      | Python   | Completed |
+| 3           | Interpreter | Java| In Progress |
 
 ## How It Works
 
