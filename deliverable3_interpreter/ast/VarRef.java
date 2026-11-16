@@ -10,7 +10,6 @@ public class VarRef extends Expr {
 
     @Override
     public Value eval(Memory m) {
-        // TODO: return m.get(name, line)
-        throw new UnsupportedOperationException("VarRef.eval");
+        return m.get(name, line);
     }
 }
