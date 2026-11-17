@@ -1,6 +1,7 @@
 package ast;
 
 import runtime.Interpreter;
+import runtime.Value;
 
 /** set <name> = <expression> */
 public class SetStmt extends Statement {
@@ -10,7 +11,7 @@ public class SetStmt extends Statement {
 
     @Override
     public void execute(Interpreter in) {
-        // TODO: v = expr.eval(in.memory()); in.memory().set(name, v, line)
-        throw new UnsupportedOperationException("SetStmt.execute");
+        Value v = expr.eval(in.memory());
+        in.memory().set(name, v, line);   // RuntimeError if the type does not match the variable
     }
 }
