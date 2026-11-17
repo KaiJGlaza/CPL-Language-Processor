@@ -12,7 +12,7 @@ begin
   if y < 1.5 then
    exit
   else
-   set y = y - 1
+   set y = y - 1.0
   endif
  else
   display "small"
