@@ -12,7 +12,7 @@ begin
     set limit = 10
     set rate = 2.5
     input "Enter a count", count
-    set total = count * rate
+    set total = rate * 2.0
     if count < limit then
         display "total: ", total
     endif

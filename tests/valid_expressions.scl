@@ -11,7 +11,7 @@ begin
   set a = 1 + 2 * 3
   set b = a * 4 - 6 / 2 + 1
   set c = a + b * a - b
-  set r = 1.5 * a / 2 - 0.25
+  set r = 1.5 * 7.0 / 2.0 - 0.25
   display a + b * c, " and ", r
   if a + b * c > b - c / 2 then
     display "bigger"
