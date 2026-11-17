@@ -26,9 +26,12 @@ public class Interpreter {
     public Value returnValue() { return returnValue; }
     public void setReturnValue(Value v) { returnValue = v; }
 
-    /** Read one line of user input; null at end of input. */
+    /**
+     * Read one line of user input. Returns null at end of input (or if reading fails).
+     * Decision: end of input is a run-time error for the input statement. InputStmt turns the
+     * null into "Runtime error (line N): no input available for 'x'", which stops the program.
+     */
     public String readLine() {
-        // TODO: decide what end of input means for the input statement (probably a RuntimeError)
         try { return stdin.readLine(); } catch (IOException e) { return null; }
     }
 
