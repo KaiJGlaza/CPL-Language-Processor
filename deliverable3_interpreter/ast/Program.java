@@ -14,6 +14,10 @@ import parser.Parser;
 import scanner.SclScanner;
 import scanner.Token;
 import scanner.TokenType;
+import runtime.Interpreter;
+import runtime.Memory;
+import runtime.Output;
+import runtime.RuntimeError;
 import runtime.ValueType;
 
 /** A parsed SCL program, plus load() and run() as the course guidelines describe. */
@@ -77,12 +81,32 @@ public class Program {
         return program;
     }
 
+    /** Where program output is logged when run() is called without a path. */
+    public static final String DEFAULT_LOG = "ProgramOutput.txt";
+
     /** Execute the program. Returns true if it finished without a runtime error. */
     public boolean run() {
-        // TODO: Memory m = new Memory(); declare every variable from declarations
-        // TODO: open Output (log file), build Interpreter, in.executeBlock(statements)
-        // TODO: catch RuntimeError -> print its message, return false
-        // TODO: close the Output
-        throw new UnsupportedOperationException("Program.run");
+        return run(DEFAULT_LOG);
+    }
+
+    /** Same, logging to the given file. Output goes to the console and the log at once. */
+    public boolean run(String logPath) {
+        // Every declared variable gets a slot in memory (0 / 0.0 until assigned).
+        Memory memory = new Memory();
+        for (Declaration d : declarations) memory.declare(d.name, d.type);
+
+        try (Output out = new Output(logPath)) {
+            Interpreter interpreter = new Interpreter(memory, out);
+            try {
+                interpreter.executeBlock(statements);
+                return true;
+            } catch (RuntimeError error) {
+                out.println(error.getMessage());   // shown on the console and saved in the log
+                return false;
+            }
+        } catch (IOException problem) {
+            System.out.println("Error: could not write '" + logPath + "': " + problem.getMessage());
+            return false;
+        }
     }
 }
