@@ -17,8 +17,11 @@ public class DisplayStmt extends Statement {
 
     @Override
     public void execute(Interpreter in) {
-        // TODO: build the output text from items (separator and real formatting: team decision)
-        // TODO: print through in.out().println(...)
-        throw new UnsupportedOperationException("DisplayStmt.execute");
+        // Default: items are joined with no separator, so display "x is ", x prints "x is 7".
+        StringBuilder sb = new StringBuilder();
+        for (Item item : items) {
+            sb.append(item.text != null ? item.text : item.expr.eval(in.memory()).toString());
+        }
+        in.out().println(sb.toString());
     }
 }
