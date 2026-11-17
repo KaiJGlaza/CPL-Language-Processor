@@ -31,7 +31,7 @@ public class StatementParser {
     }
 
     /**
-     * Read statements until endfun, else, or endif (not consumed). 
+     * Read statements until endfun, else, or endif (not consumed).
      * After a bad statement, synchronize at the next statement keyword or terminator.
      */
     public List<Statement> actions(String blockName) {
