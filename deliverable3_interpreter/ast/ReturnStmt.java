@@ -9,8 +9,9 @@ public class ReturnStmt extends Statement {
 
     @Override
     public void execute(Interpreter in) {
-        // TODO: evaluate expr, in.setReturnValue(...), in.halt()
-        // TODO: decide whether the value's type must match the function's declared return type, and what (if anything) gets printed
-        throw new UnsupportedOperationException("ReturnStmt.execute");
+        // Default: evaluate, remember the value, stop. Nothing is printed and the type is not
+        // checked against the declared return type.
+        in.setReturnValue(expr.eval(in.memory()));
+        in.halt();
     }
 }
