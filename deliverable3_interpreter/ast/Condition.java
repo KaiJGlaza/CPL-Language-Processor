@@ -1,6 +1,9 @@
 package ast;
 
 import runtime.Memory;
+import runtime.RuntimeError;
+import runtime.Value;
+import runtime.ValueType;
 
 /** left relOp right, where relOp is ">", "<", or "==". */
 public class Condition {
@@ -13,7 +16,20 @@ public class Condition {
     }
 
     public boolean eval(Memory m) {
-        // TODO: evaluate both sides; RuntimeError if types differ; compare by relOp
-        throw new UnsupportedOperationException("Condition.eval");
+        Value a = left.eval(m);
+        Value b = right.eval(m);
+        if (a.type() != b.type()) {
+            throw new RuntimeError("cannot compare integer and real in '" + a + " " + relOp + " " + b + "'", line);
+        }
+        // Compare as long or double depending on the shared type.
+        boolean gt, lt;
+        if (a.type() == ValueType.INTEGER) { gt = a.asLong() > b.asLong(); lt = a.asLong() < b.asLong(); }
+        else { gt = a.asDouble() > b.asDouble(); lt = a.asDouble() < b.asDouble(); }
+        switch (relOp) {
+            case ">":  return gt;
+            case "<":  return lt;
+            case "==": return !gt && !lt;
+        }
+        throw new IllegalStateException("unknown relational operator '" + relOp + "'");
     }
 }

@@ -4,7 +4,9 @@ import ast.Declaration;
 import ast.Program;
 import ast.Statement;
 import java.util.List;
+import runtime.ValueType;
 import scanner.Token;
+import scanner.TokenType;
 
 /**
  * Top of the grammar. Keeps D2's three public functions: getNextToken(), identifierExists(), begin().
@@ -29,27 +31,45 @@ public class Parser {
 
     /** Parse the whole program. The Program is only usable when errorCount() == 0. */
     public Program begin() {
-        // TODO: return start()
-        throw new UnsupportedOperationException("Parser.begin");
+        return start();
     }
 
     /** <program> ::= <import> "implementations" <function> */
     private Program start() {
-        // TODO: importStmt(); ctx.match("implementations"); build the Program from functionDef()
-        // TODO: any token after "endfun main" -> ctx.error("end of file after 'endfun main'", token)
-        throw new UnsupportedOperationException("start");
+        String importName = importStmt();
+        ctx.match("implementations");
+        Program program = functionDef(importName);
+
+        // Nothing may follow "endfun main".
+        Token extra = ctx.current();
+        if (extra != null) {
+            ctx.error("end of file after 'endfun main'", extra);
+        }
+        return program;
     }
 
     /** <import> ::= "import" STRING */
     private String importStmt() {
-        // TODO: match "import", match a STRING token, return its value
-        throw new UnsupportedOperationException("importStmt");
+        ctx.match("import");
+        Token name = ctx.matchType(TokenType.STRING);
+        return name != null ? name.value : null;   // null only when there was a syntax error
     }
 
     /** "function" "main" "return" "type" <type> "is" "variables" <declarations> "begin" <statements> "endfun" "main" */
     private Program functionDef(String importName) {
-        // TODO: match the header keywords; read the return type; declParser.declarations()
-        // TODO: match "begin"; stmtParser.actions("'begin' block"); match "endfun" then "main"
-        throw new UnsupportedOperationException("functionDef");
+        ctx.match("function");
+        ctx.match("main");
+        ctx.match("return");
+        ctx.match("type");
+        ValueType returnType = declParser.type();
+        ctx.match("is");
+        ctx.match("variables");
+        List<Declaration> declarations = declParser.declarations();
+        ctx.match("begin");
+        List<Statement> statements = stmtParser.actions("'begin' block");
+        if (ctx.match("endfun") != null) {
+            ctx.match("main");
+        }
+        return new Program(importName, returnType, declarations, statements);
     }
 }

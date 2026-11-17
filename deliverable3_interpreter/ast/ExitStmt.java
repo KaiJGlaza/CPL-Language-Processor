@@ -8,7 +8,6 @@ public class ExitStmt extends Statement {
 
     @Override
     public void execute(Interpreter in) {
-        // TODO: in.halt()
-        throw new UnsupportedOperationException("ExitStmt.execute");
+        in.halt();   // executeBlock stops at every level, even from inside a nested if
     }
 }

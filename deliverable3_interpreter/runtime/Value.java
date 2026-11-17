@@ -15,9 +15,12 @@ public class Value {
     public long asLong() { return l; }
     public double asDouble() { return d; }
 
+    /** Integers print as-is; reals print in plain decimal form (45.95, never 4.595E1). */
     @Override
     public String toString() {
-        // TODO: decide real formatting (45.95, not 4.595E1)
-        return type == ValueType.INTEGER ? Long.toString(l) : Double.toString(d);
+        if (type == ValueType.INTEGER) return Long.toString(l);
+        if (Double.isNaN(d) || Double.isInfinite(d)) return Double.toString(d);
+        String s = java.math.BigDecimal.valueOf(d).stripTrailingZeros().toPlainString();
+        return s.contains(".") ? s : s + ".0";   // keep ".0" so a real always looks real
     }
 }

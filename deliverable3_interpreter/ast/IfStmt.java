@@ -15,7 +15,10 @@ public class IfStmt extends Statement {
 
     @Override
     public void execute(Interpreter in) {
-        // TODO: pick the branch with cond.eval(in.memory()) and run it with in.executeBlock(...)
-        throw new UnsupportedOperationException("IfStmt.execute");
+        if (cond.eval(in.memory())) {
+            in.executeBlock(thenBlock);
+        } else {
+            in.executeBlock(elseBlock);   // an empty list when there is no else
+        }
     }
 }
