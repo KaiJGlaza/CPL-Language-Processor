@@ -55,7 +55,12 @@ Prints each recognized statement and every syntax error, then saves the
 same lines to the output file (ParserOutput.txt if none is given).
 
 **Interpreter**
-Instructions will be added with Deliverable 3.
+```
+javac -d out $(find deliverable3_interpreter -name '*.java')
+java -cp out Main tests/valid_statements.scl
+```
+Runs the program if it has no syntax errors. Program output and runtime
+errors print to the console and are saved in ProgramOutput.txt.
 
 ## Supported SCL Subset
 
@@ -66,4 +71,4 @@ and nested `if`/`else`/`endif`.
 ## Requirements
 
 - Python 3.x
-- [Java JDK, for Deliverable 3] ???
+- Java JDK 11 or newer (Deliverable 3)
